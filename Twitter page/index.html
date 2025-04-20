@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Twitter-Like Tweet Display</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-color: #ffffff;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        .top-section {
+            background-color: rgba(240, 240, 240, 0.8);
+            backdrop-filter: blur(10px);
+            padding: 3.5px 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+        .top-navigation {
+            display: flex;
+            align-items: center;
+        }
+        .back-arrow-container {
+            margin-right: 10px;
+        }
+        .back-arrow {
+            width: 21px;
+            height: 21px;
+            background-color: transparent;
+            border: none;
+            cursor: pointer;
+            position: relative;
+            border-color: rgba(0, 0, 0, 0);
+            margin-left: -8px;
+        }
+        .back-arrow:hover::after {
+            content: '';
+            position: absolute;
+            top: -5px;
+            left: -5px;
+            width: 40px;
+            height: 40px;
+            background-color: #e8e7e7;
+            border-radius: 50%;
+            z-index: -1;
+        }
+        .user-info {
+            display: flex;
+            flex-direction: column;
+        }
+        .user-name {
+            color: rgb(15, 20, 25);
+            font-size: 20px;
+            font-weight: 700;
+            line-height: 24px;
+            letter-spacing: normal;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            margin-bottom: 2px;
+        }
+        .verified svg {
+            width: 22px;
+            height: 22px;
+            fill: #1DA1F2;
+        }
+        .posts-count {
+            color: rgb(83, 100, 113);
+            font-size: 13px;
+            font-weight: 400;
+        }
+        .profile-header {
+            background-color: #fff;
+            padding: 20px;
+            border-bottom: 1px solid #e1e8ed;
+            display: flex;
+            align-items: center;
+            position: relative;
+        }
+        .profile-background {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 50%;
+            background-color: #cfd9de;
+            z-index: -1;
+        }
+        .profile-picture {
+            width: 134px;
+            height: 134px;
+            border-radius: 50%;
+            overflow: hidden;
+            margin-right: 20px;
+            border: 4px solid #fff;
+            box-shadow: 0 0 0 1px #e1e8ed;
+            position: relative;
+            z-index: 1;
+        }
+        .profile-picture img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .profile-info {
+            flex: 1;
+        }
+        .name {
+            font-size: 24px;
+            font-weight: normal;
+            color: #14171a;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .verified {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            vertical-align: middle;
+            margin-left: 2.5px;
+            margin-right: -2.5px;
+        }
+        .top-name .verified svg {
+            width: 27.2px;
+            height: 27.2px;
+            display: block;
+        }
+        .tweet-user .verified svg {
+            width: 18px;
+            height: 18px;
+            display: block;
+        }
+        .handle {
+            font-size: 18px;
+            color: #657786;
+        }
+        .join-date {
+            font-size: 15px;
+            color: #657786;
+            margin-top: 5px;
+            display: flex;
+            align-items: center;
+        }
+        .join-date svg {
+            margin-right: 5px;
+            width: 16px;
+            height: 16px;
+        }
+        .stats {
+            display: flex;
+            gap: 20px;
+            font-size: 15px;
+            margin-top: 10px;
+        }
+        .stats-item {
+            display: flex;
+            align-items: center;
+        }
+        .number {
+            font-weight: bold;
+            color: #14171a;
+        }
+        .text {
+            margin-left: 4px;
+            color: #657786;
+        }
+        .tweets-container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding-top: 15px;
+        }
+        .tweet {
+            background-color: #fff;
+            border: 1px solid #e1e8ed;
+            border-radius: 4px;
+            padding: 15px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: flex-start;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+        .tweet:hover {
+            background-color: rgb(247,247,247);
+        }
+        .tweet-profile-pic {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            overflow: hidden;
+            margin-right: 10px;
+            border: 2px solid #fff;
+        }
+        .tweet-profile-pic img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            cursor: pointer;
+        }
+        .tweet-content {
+            flex: 1;
+        }
+        .tweet-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 5px;
+        }
+        .tweet-user {
+            font-weight: bold;
+            color: #14171a;
+            font-size: 15px;
+        }
+        .tweet-handle {
+            color: #657786;
+            font-size: 15px;
+            margin-left: 5px;
+        }
+        .date-container {
+            position: relative;
+            display: inline-block;
+            margin-left: 5px;
+        }
+        .tweet-date {
+            color: #657786;
+            font-size: 15px;
+        }
+        .tweet-date:hover {
+            text-decoration: underline;
+        }
+        .detailed-date {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            background-color: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 5px;
+            border-radius: 4px;
+            font-size: 12px;
+            white-space: nowrap;
+            display: none;
+            z-index: 10;
+        }
+        .tweet-text {
+            font-size: 15px;
+            color: #14171a;
+            line-height: 1.4;
+            word-wrap: break-word;
+            margin-bottom: 10px;
+        }
+        .hashtag {
+            color: #28a0f1;
+        }
+        .tweet-actions {
+            display: flex;
+            justify-content: flex-start;
+            gap: 40px;
+            margin-top: 5px;
+        }
+        .action-item {
+            display: flex;
+            align-items: center;
+            color: rgb(83, 100, 113);
+            font-size: 14px;
+        }
+        .action-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 34.75px;
+            height: 34.75px;
+            background-color: transparent;
+            border: none;
+            cursor: pointer;
+            position: relative;
+            padding: 0;
+            border-radius: 50%;
+            margin-left: -10px;
+        }
+        .action-btn svg {
+            width: 18.75px;
+            height: 18.75px;
+            fill: rgb(83, 100, 113);
+        }
+        .action-btn:hover {
+            background-color: rgba(29, 161, 242, 0.1);
+        }
+        .action-btn:hover svg {
+            fill: #1DA1F2;
+        }
+        .like-action .action-btn:hover {
+            background-color: rgba(224, 36, 94, 0.1);
+        }
+        .like-action .action-btn:hover svg {
+            fill: #E0245E;
+        }
+        .like-action .action-btn:hover + .action-count {
+            color: #E0245E;
+        }
+        .repost-action .action-btn:hover {
+            background-color: rgba(23, 191, 99, 0.1);
+        }
+        .repost-action .action-btn:hover svg {
+            fill: #17BF63;
+        }
+        .repost-action .action-btn:hover + .action-count {
+            color: #17BF63;
+        }
+        .comment-action .action-btn:hover + .action-count {
+            color: #1DA1F2;
+        }
+        .action-count {
+            margin-left: 0;
+            font-size: 13px;
+            color: rgb(83, 100, 113);
+        }
+        .analytics-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 34.75px;
+            height: 34.75px;
+            background-color: transparent;
+            border: none;
+            cursor: pointer;
+            border-radius: 50%;
+            margin-left: -10px;
+        }
+        .analytics-btn svg {
+            width: 18.75px;
+            height: 18.75px;
+            fill: rgb(83, 100, 113);
+        }
+        .analytics-btn:hover {
+            background-color: rgba(29, 161, 242, 0.1);
+        }
+        .analytics-btn:hover svg {
+            fill: #1DA1F2;
+        }
+        .tweet-user:hover {
+            text-decoration: underline;
+        }
+        .tweet-profile-pic img:hover {
+            filter: brightness(90%);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="top-section">
+            <div class="top-navigation">
+                <div class="back-arrow-container">
+                    <button class="back-arrow">
+                        <svg viewBox="0 0 24 24" aria-hidden="true" style="color: rgb(15, 20, 25);">
+                            <g>
+                                <path d="M7.414 13l5.043 5.04-1.414 1.42L3.586 12l7.457-7.46 1.414 1.42L7.414 11H21v2H7.414z"></path>
+                            </g>
+                        </svg>
+                    </button>
+                </div>
+                <div class="user-info">
+                    <h2 class="user-name">
+                        <span>emory tate</span>
+                        <span class="verified">
+                            <svg viewBox="0 0 22 22" aria-label="Verified account">
+                                <g>
+                                    <path fill="#1DA1F2" d="M20.396 11c-.018-.646-.215-1.275-.57-1.816-.354-.54-.852-.972-1.438-1.246.223-.607.27-1.264.14-1.897-.131-.634-.437-1.218-.882-1.687-.47-.445-1.053-.75-1.687-.882-.633-.13-1.29-.083-1.897.14-.273-.587-.704-1.086-1.245-1.44S11.647 1.62 11 1.604c-.646.017-1.273.213-1.813.568s-.969.854-1.24 1.44c-.608-.223-1.267-.272-1.902-.14-.635.13-1.22.436-1.69.882-.445.47-.749 1.055-.878 1.688-.13.633-.08 1.29.144 1.896-.587.274-1.087.705-1.443 1.245-.356.54-.555 1.17-.574 1.817.02.647.218 1.276.574 1.817.356.54.856.972 1.443 1.245-.224.606-.274 1.263-.144 1.896.13.634.433 1.218.877 1.688.47.443 1.054.747 1.687.878.633.132 1.29.084 1.897-.136.274.586.705 1.084 1.246 1.439.54.354 1.17.551 1.816.569.647-.016 1.276-.213 1.817-.567s.972-.854 1.245-1.44c.604.239 1.266.296 1.903.164.636-.132 1.22-.447 1.68-.907.46-.46.776-1.044.908-1.681s.075-1.299-.165-1.903c.586-.274 1.084-.705 1.439-1.246.354-.54.551-1.17.569-1.816zM9.662 14.85l-3.429-3.428 1.293-1.302 2.072 2.072 4.4-4.794 1.347 1.246z"></path>
+                                </g>
+                            </svg>
+                        </span>
+                    </h2>
+                    <div class="posts-count">186 posts</div>
+                </div>
+            </div>
+        </div>
+        <div class="profile-header">
+            <div class="profile-background"></div>
+            <div class="profile-picture">
+                <img src="profile-pic.jpg" alt="Profile Picture">
+            </div>
+            <div class="profile-info">
+                <div class="name">emory tate<span class="verified"><svg viewBox="0 0 22 22" aria-hidden="true"><g><path fill="#1DA1F2" d="M20.396 11c-.018-.646-.215-1.275-.57-1.816-.354-.54-.852-.972-1.438-1.246.223-.607.27-1.264.14-1.897-.131-.634-.437-1.218-.882-1.687-.47-.445-1.053-.75-1.687-.882-.633-.13-1.29-.083-1.897.14-.273-.587-.704-1.086-1.245-1.44S11.647 1.62 11 1.604c-.646.017-1.273.213-1.813.568s-.969.854-1.24 1.44c-.608-.223-1.267-.272-1.902-.14-.635.13-1.22.436-1.69.882-.445.47-.749 1.055-.878 1.688-.13.633-.08 1.29.144 1.896-.587.274-1.087.705-1.443 1.245-.356.54-.555 1.17-.574 1.817.02.647.218 1.276.574 1.817.356.54.856.972 1.443 1.245-.224.606-.274 1.263-.144 1.896.13.634.433 1.218.877 1.688.47.443 1.054.747 1.687.878.633.132 1.29.084 1.897-.136.274.586.705 1.084 1.246 1.439.54.354 1.17.551 1.816.569.647-.016 1.276-.213 1.817-.567s.972-.854 1.245-1.44c.604.239 1.266.296 1.903.164.636-.132 1.22-.447 1.68-.907.46-.46.776-1.044.908-1.681s.075-1.299-.165-1.903c.586-.274 1.084-.705 1.439-1.246.354-.54.551-1.17.569-1.816zM9.662 14.85l-3.429-3.428 1.293-1.302 2.072 2.072 4.4-4.794 1.347 1.246"></path></g></svg></span></div>
+                <div class="handle">@taterrific</div>
+                <div class="join-date">
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <g>
+                            <path d="M7 4V3h2v1h6V3h2v1h1.5C19.89 4 21 5.12 21 6.5v12c0 1.38-1.11 2.5-2.5 2.5h-13C4.12 21 3 19.88 3 18.5v-12C3 5.12 4.12 4 5.5 4H7zm0 2H5.5c-.27 0-.5.22-.5.5v12c0 .28.23.5.5.5h13c.28 0 .5-.22.5-.5v-12c0-.28-.22-.5-.5-.5H17v1h-2V6H9v1H7V6zm0 6h2v-2H7v2zm0 4h2v-2H7v2zm4-4h2v-2h-2v2zm0 4h2v-2h-2v2zm4-4h2v-2h-2v2z"></path>
+                        </g>
+                    </svg>
+                    <span>Joined October 2011</span>
+                </div>
+                <div class="stats">
+                    <div class="stats-item">
+                        <span class="number">16</span>
+                        <span class="text">Following</span>
+                    </div>
+                    <div class="stats-item">
+                        <span class="number">167.7K</span>
+                        <span class="text">Followers</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="tweets-container" id="tweets-container"></div>
+    </div>
+
+    <script>
+        fetch('tweets.json')
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(tweets => {
+                const container = document.getElementById('tweets-container');
+                const urlPattern = /(https?:\/\/[^\s]+|www\.[^\s]+)/g;
+                tweets.forEach(tweet => {
+                    const dateObj = new Date(tweet.timestamp);
+                    const date = dateObj.toLocaleDateString('en-US', {
+                        year: 'numeric',
+                        month: 'short',
+                        day: 'numeric'
+                    });
+                    const timePart = dateObj.toLocaleTimeString('en-US', { hour: 'numeric', minute: 'numeric', hour12: true });
+                    const datePart = dateObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+                    const detailedDateStr = `${timePart} · ${datePart}`;
+
+                    const textWithHashtags = tweet.text.replace(/#(\w+)/g, '<span class="hashtag">#$1</span>');
+                    const textWithLinks = textWithHashtags.replace(urlPattern, (match) => {
+                        let url = match;
+                        if (match.startsWith('www.')) {
+                            url = 'http://' + match;
+                        }
+                        return `<a href="${url}" style="color: #1DA1F2;" target="_blank">${match}</a>`;
+                    });
+
+                    const tweetElement = document.createElement('div');
+                    tweetElement.className = 'tweet';
+                    tweetElement.innerHTML = `
+                        <div class="tweet-profile-pic"><img src="profile-pic.jpg" alt="Profile Picture"></div>
+                        <div class="tweet-content">
+                            <div class="tweet-header">
+                                <span class="tweet-user">emory tate<span class="verified"><svg viewBox="0 0 22 22" aria-hidden="true"><g><path fill="#1DA1F2" d="M20.396 11c-.018-.646-.215-1.275-.57-1.816-.354-.54-.852-.972-1.438-1.246.223-.607.27-1.264.14-1.897-.131-.634-.437-1.218-.882-1.687-.47-.445-1.053-.75-1.687-.882-.633-.13-1.29-.083-1.897.14-.273-.587-.704-1.086-1.245-1.44S11.647 1.62 11 1.604c-.646.017-1.273.213-1.813.568s-.969.854-1.24 1.44c-.608-.223-1.267-.272-1.902-.14-.635.13-1.22.436-1.69.882-.445.47-.749 1.055-.878 1.688-.13.633-.08 1.29.144 1.896-.587.274-1.087.705-1.443 1.245-.356.54-.555 1.17-.574 1.817.02.647.218 1.276.574 1.817.356.54.856.972 1.443 1.245-.224.606-.274 1.263-.144 1.896.13.634.433 1.218.877 1.688.47.443 1.054.747 1.687.878.633.132 1.29.084 1.897-.136.274.586.705 1.084 1.246 1.439.54.354 1.17.551 1.816.569.647-.016 1.276-.213 1.817-.567s.972-.854 1.245-1.44c.604.239 1.266.296 1.903.164.636-.132 1.22-.447 1.68-.907.46-.46.776-1.044.908-1.681s.075-1.299-.165-1.903c.586-.274 1.084-.705 1.439-1.246.354-.54.551-1.17.569-1.816zM9.662 14.85l-3.429-3.428 1.293-1.302 2.072 2.072 4.4-4.794 1.347 1.246z"></path></g></svg></span></span>
+                                <span class="tweet-handle">@taterrific · </span>
+                                <div class="date-container">
+                                    <span class="tweet-date">${date}</span>
+                                    <div class="detailed-date">${detailedDateStr}</div>
+                                </div>
+                            </div>
+                            <div class="tweet-text">${textWithLinks}</div>
+                            <div class="tweet-actions">
+                                <div class="action-item comment-action">
+                                    <button aria-label="${tweet.replies} Replies. Reply" class="action-btn" data-testid="reply">
+                                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                                            <g>
+                                                <path d="M1.751 10c0-4.42 3.584-8 8.005-8h4.366c4.49 0 8.129 3.64 8.129 8.13 0 2.96-1.607 5.68-4.196 7.11l-8.054 4.46v-3.69h-.067c-4.49.1-8.183-3.51-8.183-8.01zm8.005-6c-3.317 0-6.005 2.69-6.005 6 0 3.37 2.77 6.08 6.138 6.01l.351-.01h1.761v2.3l5.087-2.81c1.951-1.08 3.163-3.13 3.163-5.36 0-3.39-2.744-6.13-6.129-6.13H9.756z"></path>
+                                            </g>
+                                        </svg>
+                                    </button>
+                                    <span class="action-count">${tweet.replies}</span>
+                                </div>
+                                <div class="action-item repost-action">
+                                    <button aria-label="${tweet.retweets} reposts. Repost" class="action-btn" data-testid="retweet">
+                                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                                            <g>
+                                                <path d="M4.5 3.88l4.432 4.14-1.364 1.46L5.5 7.55V16c0 1.1.896 2 2 2H13v2H7.5c-2.209 0-4-1.79-4-4V7.55L1.432 9.48.068 8.02 4.5 3.88zM16.5 6H11V4h5.5c2.209 0 4 1.79 4 4v8.45l2.068-1.93 1.364 1.46-4.432 4.14-4.432-4.14 1.364-1.46 2.068 1.93V8c0-1.1-.896-2-2-2z"></path>
+                                            </g>
+                                        </svg>
+                                    </button>
+                                    <span class="action-count">${tweet.retweets}</span>
+                                </div>
+                                <div class="action-item like-action">
+                                    <button aria-label="${tweet.likes} Likes. Like" class="action-btn" data-testid="like">
+                                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                                            <g>
+                                                <path d="M16.697 5.5c-1.222-.06-2.679.51-3.89 2.16l-.805 1.09-.806-1.09C9.984 6.01 8.526 5.44 7.304 5.5c-1.243.07-2.349.78-2.91 1.91-.552 1.12-.633 2.78.479 4.82 1.074 1.97 3.257 4.27 7.129 6.61 3.87-2.34 6.052-4.64 7.126-6.61 1.111-2.04 1.03-3.7.477-4.82-.561-1.13-1.666-1.84-2.908-1.91zm4.187 7.69c-1.351 2.48-4.001 5.12-8.379 7.67l-.503.3-.504-.3c-4.379-2.55-7.029-5.19-8.382-7.67-1.36-2.5-1.41-4.86-.514-6.67.887-1.79 2.647-2.91 4.601-3.01 1.651-.09 3.368.56 4.798 2.01 1.429-1.45 3.146-2.1 4.796-2.01 1.954.1 3.714 1.22 4.601 3.01.896 1.81.846 4.17-.514 6.67z"></path>
+                                            </g>
+                                        </svg>
+                                    </button>
+                                    <span class="action-count">${tweet.likes}</span>
+                                </div>
+                                <div class="action-item">
+                                    <a href="/tateterrific/status/309450553191186432/analytics" aria-label="View post analytics" class="analytics-btn">
+                                        <svg viewBox="0 0 24 24" aria-hidden="true">
+                                            <g>
+                                                <path d="M8.75 21V3h2v18h-2zM18 21V8.5h2V21h-2zM4 21l.004-10h2L6 21H4zm9.248 0v-7h2v7h-2z"></path>
+                                            </g>
+                                        </svg>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+
+                    const profilePic = tweetElement.querySelector('.tweet-profile-pic img');
+                    profilePic.addEventListener('click', () => {
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                    });
+
+                    const dateContainer = tweetElement.querySelector('.date-container');
+                    const tweetDate = dateContainer.querySelector('.tweet-date');
+                    const detailedDate = dateContainer.querySelector('.detailed-date');
+                    let timeoutId;
+
+                    tweetDate.addEventListener('mouseenter', () => {
+                        timeoutId = setTimeout(() => {
+                            detailedDate.style.display = 'block';
+                        }, 800);
+                    });
+
+                    tweetDate.addEventListener('mouseleave', () => {
+                        clearTimeout(timeoutId);
+                        detailedDate.style.display = 'none';
+                    });
+
+                    container.appendChild(tweetElement);
+                });
+            })
+            .catch(error => {
+                console.error('Error loading tweets:', error);
+                const container = document.getElementById('tweets-container');
+                container.innerHTML = '<p>Error loading tweets. Please check the console for details.</p>';
+            });
+    </script>
+</body>
+</html>
